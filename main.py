@@ -1,3 +1,8 @@
+'''
+Main file for the Space Invader Game
+Using pygame Module
+'''
+
 import pygame
 from pygame import mixer
 import random
@@ -25,6 +30,7 @@ playerX_change = 0
 playerY_change = 0
 
 # enemy
+target = pygame.image.load('target.png')
 enemyImg = []
 enemyX = []
 enemyY = []
@@ -34,7 +40,7 @@ num_enemies = 5
 
 # for multiple enemies
 for i in range(num_enemies):
-    enemyImg.append(pygame.image.load('target.png'))
+    enemyImg.append(target)
     enemyX.append(random.randint(0, 736))
     enemyY.append(random.randint(50, 100))
     enemyX_change.append(3)
@@ -65,6 +71,9 @@ for i in range(num_lives):
     lifeX.append(X - 42)
     lifeY.append(5)
     X -= 42
+
+# level up
+alien = pygame.image.load('alien.png')
 
 
 # function to draw the player on screen
@@ -192,9 +201,27 @@ while running:
             # reset the bullet and reset the enemy
             bulletY = playerY
             bullet_state = False
+
+            # if alien is hit then change it to target
+            if enemyImg[i] == alien:
+                enemyImg[i] = target
             enemyX[i] = random.randint(0, 736)
             enemyY[i] = random.randint(50, 150)
             score_value += 1
+
+            if score_value % 5 == 0 and score_value != 0:
+                # for multiple enemies
+                for k in range(3):
+                    enemyImg.append(alien)
+                    enemyX.append(random.randint(0, 736))
+                    enemyY.append(random.randint(50, 100))
+                    enemyX_change.append(6)
+                    enemyY_change.append(30)
+
+                    levelUp_sound = mixer.Sound('level_up.wav')
+                    levelUp_sound.play()
+
+                num_enemies += 3
 
         # function calling
         enemy(enemyX[i], enemyY[i], i)
@@ -203,7 +230,7 @@ while running:
     for i in range(num_lives):
         lives(lifeX[i], lifeY[i])
 
-        # collision detection
+        # player collision detection
         for j in range(num_enemies):
             collisionPlayer = isCollision(enemyX[j], enemyY[j], playerX, playerY)
             if collisionPlayer:
@@ -237,3 +264,4 @@ while running:
 
     # update screen
     pygame.display.update()
+
